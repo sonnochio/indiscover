@@ -1,0 +1,16 @@
+pytest
+pylint
+ipdb
+jupyterlab
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+Pillow
+tensorflow-macos
+nltk
+stop-words
+gensim==4.2.0
+
+
