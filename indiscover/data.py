@@ -34,46 +34,69 @@ def get_products_df(read_csv=True):
 
         return df_products
 
-def load_image_nparray(num):
+def return_image(url):
+    img=Image.open(url).resize((360,360))
+    if img.mode=="RGB" :
+        img_data=np.asarray(img,dtype="int32" ).astype('float32')/255
+    else :
+        img_data=np.asarray(img.convert('RGB'), dtype="int32" ).astype('float32')/255
+    return img_data
+
+def load_image_nparray(num, try_except=False):
     """
     load the dataset images and convert them to numpy array.
 
     """
     url=(f"images/image_{num}.jpg")
+    breakpoint()
+    if try_except:
+        try:
+            return return_image(url)
+        except:
+            pass
+    else:
+        return return_image(url)
 
-    img=Image.open(url).resize((360,360))
-    if img.mode=="RGB" :
-        img_data=np.asarray(img,dtype="int32" ).astype('float32')/255
-    else :
-        img_data=np.asarray(img.convert('RGB'), dtype="int32" ).astype('float32')/255
-
-    return img_data
-
-def load_query_image_nparray(num):
+def load_query_image_nparray(num, try_except=False):
     """
     load the query image and convert it to numpy array.
     """
     url=(f"test_img/test{num}.jpg")
-    img=Image.open(url).resize((360,360))
-    if img.mode=="RGB" :
-        img_data=np.asarray(img,dtype="int32" ).astype('float32')/255
-    else :
-        img_data=np.asarray(img.convert('RGB'), dtype="int32" ).astype('float32')/255
-    img_data=np.expand_dims(img_data, axis=0)
-    return img_data
 
-def save_pickle(num):
+    if try_except:
+        try:
+            img_data=return_image(url)
+            img_data=np.expand_dims(img_data, axis=0)
+            return img_data
+        except:
+            pass
+    else:
+        img_data=return_image(url)
+        img_data=np.expand_dims(img_data, axis=0)
+        return img_data
+
+
+def save_pickle(num, df_full, try_except=False):
     """
     saving a numpy image as a pickle file.
     """
+    if try_except:
+        try:
+            img_data=load_image_nparray(num)
 
-    img_data=load_image_nparray(num)
+            with open(f'image_data/image_{num}.pickle', 'wb') as handle:
+                pk.dump(img_data, handle, protocol=pk.HIGHEST_PROTOCOL)
+        except:
+            pass
+            # df_full[].drop()
 
-    with open(f'image_data/image_{num}.pickle', 'wb') as handle:
-        pk.dump(img_data, handle, protocol=pk.HIGHEST_PROTOCOL)
+    # else:
+    #     img_data=load_image_nparray(num, try_except)
+    #     with open(f'image_data/image_{num}.pickle', 'wb') as handle:
+    #         pk.dump(img_data, handle, protocol=pk.HIGHEST_PROTOCOL)
 
 
-def load_all_latent_chunks():
+def load_all_latent_chunks(to_csv=False):
 
     """
     load all latent encoded chunks and save them in a dataframe
@@ -93,6 +116,8 @@ def load_all_latent_chunks():
 
     df["file_num"]=df["file_name"].apply(file_num)
     df=df.sort_values("file_num").reset_index(drop=True)
-    df.to_csv("latent_pics.csv")
+
+    if to_csv:
+        df.to_csv("latent_pics.csv")
 
     return df

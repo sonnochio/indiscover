@@ -25,21 +25,29 @@ def build_encoder(latent_dimension):
 
     return encoder
 
-def encode_chunks_save_pickle(encoder):
-    data_pickles=np.array(os.listdir('image_data'))
-    chunks=np.array_split(data_pickles,10)
+def encode_chunks_save_pickle(encoder, chunk_num):
 
-    for i in np.arange(7,len(chunks)):
+    data_pickles=np.array(os.listdir('image_data'))
+    chunks=np.array_split(data_pickles,chunk_num)
+
+    for i in np.arange(len(chunks)):
         img_data_ls=[]
         df=pd.DataFrame()
 
         for p in chunks[i]:
             with open(f'image_data/{p}','rb') as handle:
                 img_data=pk.load(handle)
-            img_data_ls.append(img_data)
+            try:
+                if img_data == None:
+                    pass
+            except:
+                img_data_ls.append(img_data)
 
         X=np.array(img_data_ls)
+
+        # breakpoint()
         latent_X=encoder.predict(X)
+
         df=pd.DataFrame([chunks[i],latent_X])
 
         with open(f"latent_chunks/latent{i}.pickle","wb") as handle:

@@ -6,28 +6,29 @@ import pickle as pk
 import PIL
 import os
 from indiscover.encode import build_encoder, encode_chunks_save_pickle, d2v
-from indiscover.data import load_query_image_nparray, load_all_latent_chunks, load_full_df, get_products_df
-from indiscover.cos_sim import return_top_k_images
+from indiscover.data import load_query_image_nparray, load_all_latent_chunks, load_full_df, get_products_df, save_pickle
+from indiscover.cos_sim import return_top_k_images, get_similar_text
 from indiscover.preprocessing import clean_sentence,remove_punctuation, tokenize, query_clean, preprocessor
 from PIL import Image
 from stop_words import get_stop_words
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import requests
 
 
 #load dataframes
 df=get_products_df(read_csv=True)
 df_full=load_full_df()
+
+#prepare user dataframe for front end
 df_interface=df_full.merge(df, how='right',on='product_page').drop_duplicates("product_name")
 df_interface=df_interface[['product_name', 'designer_name', 'designer_page',
        'designer_description', 'product_page', 'product_image_url',
        'product_description']]
 
-#preprocess dataframe
-df_proc=preprocessor(df)
 
+def image_workflow(num,encode_all_image=False, load_model=False):
 
-def image_workflow(encode_all_image=False):
 
     #build latent space enocder for imgae processing
     encoder=build_encoder(50)
@@ -35,23 +36,25 @@ def image_workflow(encode_all_image=False):
 
     #encode the whole image dataset and load csv
     if encode_all_image:
-        encode_chunks_save_pickle(encoder)
-        print("✅added clean text column")
+        breakpoint()
+        df_full["num"].apply(lambda x: save_pickle(x, df_full,try_except=True))
+        encode_chunks_save_pickle(encoder,1)
+        print("✅latent encoded all chunks of image numpy arrays")
+
     else:
-        print("✅not coding anything, opening the text")
+        print("✅not encoding, about to load all_latent_chunks")
 
     df=load_all_latent_chunks()
-    #encode query image
-    query_img_data=load_query_image_nparray(3)
-    query_latent=encoder.predict(query_img_data)
 
+    #encode query image, num is test image number
+    query_img_data=load_query_image_nparray(num)
+    query_latent=encoder.predict(query_img_data)
     df_top_k_images=return_top_k_images(query_latent,df,3)
 
     return df_top_k_images
 
-def show_response_images(url,df_top_k_images):
+def image_query(url,df_top_k_images):
     product_list=[]
-
 
     for i in df_top_k_images["file_num"].tolist():
         product_name=df_full[df_full["num"]==i]["product_name"].values[0]
@@ -61,37 +64,28 @@ def show_response_images(url,df_top_k_images):
             product_list.append(product_name)
 
             fig, (ax1,ax2) = plt.subplots(1,2,figsize=(5,5))
-            ax1.imshow(Image.open(f'images/image_{i}.jpg'))
-            ax2.imshow(Image.open(url))
 
+
+            ax1_url=df_full["product_image_url"].loc[i]
+
+            ax2_url=url
+
+            ax1.imshow(Image.open(requests.get(ax1_url, stream=True).raw))
+            ax2.imshow(Image.open(ax2_url))
+
+            plt.show()
     pass
 
 def text_query(query, topk):
-
 
     #set english stopwords and vectorize texts
     stop_words = get_stop_words('en')
     vectorizer=TfidfVectorizer(stop_words=stop_words, tokenizer=tokenize)
     tfidf_mat=vectorizer.fit_transform(df_proc["clean_text"].values)
 
-    def get_similar_text(query_text,tfidf_mat,k):
-    #tokenize and embed query text
-        query_tokens=tokenize(remove_punctuation(query_text))
-        embed_query=vectorizer.transform(query_tokens)
+    #return query text
 
-        #calculate the similarity between each token vs the entire tfidf matrix
-        sim_mat=cosine_similarity(embed_query,tfidf_mat)
-
-        #returns the k number of indeces with the highest similarity
-        cos_sim=np.mean(sim_mat, axis=0)
-        index=np.argsort(cos_sim)[::-1]
-
-        mask=np.ones(len(cos_sim))
-        mask = np.logical_or(cos_sim[index]!=0, mask)
-        return index[mask][:k]
-
-
-    return get_similar_text(query, tfidf_mat, topk)
+    return get_similar_text(query, tfidf_mat, topk, vectorizer)
 
 def similar_product_query(query_list):
     response_ls=[]
@@ -103,6 +97,12 @@ def similar_product_query(query_list):
 
     return df_proc[response_ls]
 
+# def text_image_query(text, image_url):
+
+#     indexes=text_query(text, 100)
+
+
+
 
 
 """
@@ -111,10 +111,13 @@ to run everything,
 """
 
 
-query_response=text_query("hello bitch dress", 3)
+# query_response=text_query("hello bitch dress", 3)
+# print ("finished running text query✅")
 
-
-
+num=1
+test_img_url=f"test_img/test{num}.jpg"
+df_top_k_images=image_workflow(num, encode_all_image=True)
+image_query(test_img_url,df_top_k_images)
 
 # for i in query_response:
 #     print(df_interface[i])
