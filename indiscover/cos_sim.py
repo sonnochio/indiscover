@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics.pairwise import cosine_similarity
 from PIL import Image
-from indiscover.preprocessing import remove_punctuation, tokenize
+from preprocessing import remove_punctuation, tokenize
 
 
 
 def return_top_k_images(img_latent,df,k):
+
     df=df.dropna()
-    breakpoint()
     df["cos_sim"]=df["img_latent"].apply(lambda x : cosine_similarity(img_latent,[x]))
     df=df.sort_values("cos_sim", ascending=False)[:k]
     return df
