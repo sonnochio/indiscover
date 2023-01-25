@@ -28,7 +28,7 @@ df_interface=df_full.merge(df_products.drop("num", axis=1), how='left',on='produ
 
 def image_workflow(topk, image=None, url=None, encode_all_image=False, load_tf_model=False, return_images=True):
     if load_tf_model==True:
-        encoder=load_model('../models/encoder')
+        encoder=load_model('models/encoder')
         print("✅loaded encoder")
 
     else:
@@ -165,7 +165,7 @@ def text_image_query(text, query_image, load_tf_model=False, df_products=df_prod
 
     #load model
     if load_tf_model:
-        encoder=load_model('../models/encoder')
+        encoder=load_model('models/encoder')
         print("✅loaded encoder")
 
     else:

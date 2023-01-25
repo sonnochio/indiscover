@@ -15,7 +15,7 @@ def load_full_df():
     """load full dataset, extracted from ap0cene
 
     """
-    df_full=pd.read_csv('../data/df_full_image_url.csv')
+    df_full=pd.read_csv('data/df_full_image_url.csv')
     df_full.drop('Unnamed: 0',axis=1,inplace=True)
     df_full=df_full.dropna()
 
@@ -107,7 +107,7 @@ def load_all_latent_chunks(to_csv=False, from_csv=True):
     load all latent encoded chunks and save them in a dataframe
     """
     if from_csv:
-        with open('../data/full_latent_embedding.pickle','rb') as h:
+        with open('data/full_latent_embedding.pickle','rb') as h:
             df=pk.load(h)
 
     else:
