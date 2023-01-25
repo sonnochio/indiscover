@@ -26,9 +26,9 @@ def get_products_df(read_csv=True):
     load products dataframe and do basic cleaning
     """
     if read_csv:
-        return pd.read_csv("../data/df_products.csv").drop("Unnamed: 0", axis=1)
+        return pd.read_csv("data/df_products.csv").drop("Unnamed: 0", axis=1)
     else:
-        df_full=pd.read_csv("../data/df_full_image_url.csv")
+        df_full=pd.read_csv("data/df_full_image_url.csv")
         df_full=df_full.dropna()
 
         #dropping duplicated pages
