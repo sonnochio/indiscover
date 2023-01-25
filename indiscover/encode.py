@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import pickle as pk
+from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
@@ -24,6 +25,8 @@ def build_encoder(latent_dimension):
     encoder.add(Dense(latent_dimension, activation='sigmoid'))
 
     return encoder
+
+
 
 def encode_chunks_save_pickle(encoder, chunk_num):
 

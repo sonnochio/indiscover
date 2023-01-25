@@ -8,7 +8,8 @@ from PIL import Image
 import requests
 from data_util import open_streamlit
 from streamlit_cropper import st_cropper
-
+from streamlit_lottie import st_lottie
+# st.set_page_config(layout="wide")
 #load dataframes
 df_products=get_products_df(read_csv=True)
 df_full=load_full_df()
@@ -24,15 +25,29 @@ df_interface=df_full.merge(df_products.drop("num", axis=1), how='left',on='produ
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
-st.markdown("""
-<style>
-.big-font {
-    font-size:100px !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
-st.markdown('<p class="big-font">inDiscover 💡</p>', unsafe_allow_html=True)
+columns=st.columns([2,1])
+
+with columns[0]:
+
+    st.markdown("""
+    <style>
+    .big-font {
+        font-size:100px !important;
+        style="font-family:Verdana, sans-serif;;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<p class="big-font"><b>inDiscover</b> </p>', unsafe_allow_html=True)
+
+with columns[1]:
+
+    logo_url="https://assets2.lottiefiles.com/packages/lf20_sen1ai7d.json"
+    logo_json=requests.get(logo_url).json()
+    st_lottie(logo_json, height=200)
+
+
 
 st.markdown("""
 <style>
@@ -46,30 +61,36 @@ st.markdown('''<p class="mid-font">Discover fashion items from independent desin
 
 st.caption("Describe your item or upload an image, or do both for better results. Crop your image to item for even better results! (Hint: You can be creative with the image, upload a pattern or a moodboard to see what happens!) ")
 
-columns=st.columns(2)
+
+
+st.markdown("""---""")
+
+user_text=st.text_area('Description', height=0)
+st.markdown("""---""")
+
+columns=st.columns([1,2])
+
+
+
+
 with columns[0] :
-    user_text=st.text_area('Description', height=0)
+    realtime_update = st.checkbox(label="Update in Real Time", value=True)
+    box_color = st.color_picker(label="Box Color", value='#FFE900')
+
+    # with columns[1] :
+    aspect_dict = {
+            "1:1": (1, 1),
+            "16:9": (16, 9),
+            "4:3": (4, 3),
+            "2:3": (2, 3),
+            "Free": None
+    }
+    aspect_choice = st.radio(label="Box Ratio", options=["1:1", "16:9", "4:3", "2:3", "Free"])
+
+    aspect_ratio = aspect_dict[aspect_choice]
 
 with columns[1] :
     image_query= st.file_uploader("Image")
-
-# st.caption('Crop your image to item for better results!')
-# columns=st.columns(2)
-# with columns[0] :
-realtime_update = st.checkbox(label="Update in Real Time", value=True)
-box_color = st.color_picker(label="Box Color", value='#FFE900')
-
-# with columns[1] :
-aspect_dict = {
-        "1:1": (1, 1),
-        "16:9": (16, 9),
-        "4:3": (4, 3),
-        "2:3": (2, 3),
-        "Free": None
-}
-aspect_choice = st.radio(label="Box Ratio", options=["1:1", "16:9", "4:3", "2:3", "Free"])
-
-aspect_ratio = aspect_dict[aspect_choice]
 
 if image_query:
     img = Image.open(image_query)
@@ -83,6 +104,8 @@ if image_query:
     st.write("Preview")
     _ = cropped_img.thumbnail((150,150))
     st.image(cropped_img)
+
+st.markdown("""---""")
 
 
 submitted = st.button("inDiscover")
