@@ -1,12 +1,5 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import os
-from PIL import Image
 import re
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
 

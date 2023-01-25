@@ -1,7 +1,5 @@
 import streamlit as st
 from main import text_query, image_workflow, return_image_query,text_image_query
-import pandas as pd
-import numpy as np
 from data_util import load_full_df, get_products_df
 from preprocessing import preprocessor
 from PIL import Image

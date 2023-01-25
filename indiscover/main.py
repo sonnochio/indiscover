@@ -4,16 +4,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle as pk
 from tensorflow.keras.models import load_model
-import PIL
-import os
-from encode import build_encoder, encode_chunks_save_pickle, d2v
+from encode import build_encoder, encode_chunks_save_pickle
 from data_util import load_query_image_nparray, load_all_latent_chunks, load_full_df, get_products_df, save_pickle
 from cos_sim import return_top_k_images, get_similar_text
-from preprocessing import clean_sentence,remove_punctuation, tokenize, query_clean, preprocessor
+from preprocessing import tokenize,  preprocessor
 from PIL import Image
 from stop_words import get_stop_words
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import requests
 import streamlit as st
 
@@ -137,15 +134,17 @@ def text_query(query, topk):
 
     return df_proc.loc[proc_indexes]["num"].tolist()
 
-def similar_product_query(query_index_list):
-    response_ls=[]
-    for query in query_index_list:
-        most_similar_indexs=d2v.docvecs.most_similar(query,topn=5)
-        response_ls.append(most_similar_indexs)
+#recommend prodcuts based on shopping cart
 
-    df_proc=preprocessor(df_products)
+# def similar_product_query(query_index_list):
+#     response_ls=[]
+#     for query in query_index_list:
+#         most_similar_indexs=d2v.docvecs.most_similar(query,topn=5)
+#         response_ls.append(most_similar_indexs)
 
-    return df_proc[response_ls]
+#     df_proc=preprocessor(df_products)
+
+#     return df_proc[response_ls]
 
 def text_image_query(text, query_image, load_tf_model=False, df_products=df_products):
 
@@ -181,32 +180,6 @@ def text_image_query(text, query_image, load_tf_model=False, df_products=df_prod
     return_image_query(df_top_k_images,query_image=query_image, front_end=True)
 
     pass
-
-
-
-
-"""
-to run everything,
-
-"""
-# num=1
-# test_img_url=f"test_img/test{num}.jpg"
-
-# query_response=text_query("simple sustainable white t-shirt", 3)
-
-# for i in query_response:
-#     print(df_interface.loc[i])
-#     plt.imshow(Image.open(requests.get(df_full['product_image_url'][i], stream=True).raw))
-#     plt.show()
-# print ("finished running text query✅")
-
-# topk=10
-# num=1
-# test_img_url=f"test_img/test{num}.jpg"
-# df_top_k_images=image_workflow(num,topk)
-# return_image_query(test_img_url,df_top_k_images)
-
-
 
 
 print ("main page running✅")
