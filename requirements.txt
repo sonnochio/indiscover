@@ -8,9 +8,10 @@ matplotlib
 seaborn
 scikit-learn
 Pillow
-tensorflow-macos
+tensorflow
 nltk
 stop-words
-gensim==4.2.0
-
-
+fastapi
+uvicorn
+streamlit-cropper
+streamlit-lottie
