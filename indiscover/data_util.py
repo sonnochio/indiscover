@@ -36,12 +36,19 @@ def get_products_df(read_csv=True):
 
         return df_products
 
-def return_image(url):
-    img=Image.open(url).resize((360,360))
+def return_image(img, cropping=False):
+
+    if  cropping==False:
+        img=Image.open(img).resize((360,360))
+    else:
+        img=img.resize((360,360))
+
+
     if img.mode=="RGB" :
         img_data=np.asarray(img,dtype="int32" ).astype('float32')/255
     else :
         img_data=np.asarray(img.convert('RGB'), dtype="int32" ).astype('float32')/255
+
     return img_data
 
 def load_image_nparray(num, try_except=False):
@@ -66,13 +73,12 @@ def load_query_image_nparray(image=None,url=None,use_url=False, try_except=False
     if use_url==True:
         url=url
         img_data=return_image(url)
-        img_data=np.expand_dims(img_data, axis=0)
-        return img_data
-    else:
 
-        img_data=return_image(image)
-        img_data=np.expand_dims(img_data, axis=0)
-        return img_data
+    else:
+        img_data=return_image(image, cropping=True)
+
+    img_data=np.expand_dims(img_data, axis=0)
+    return img_data
 
 
 def save_pickle(num, df_full, try_except=False):

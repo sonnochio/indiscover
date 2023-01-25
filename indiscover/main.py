@@ -64,7 +64,7 @@ def image_workflow(topk, image=None, url=None, encode_all_image=False, load_tf_m
 
         return df_top_k_images
 
-def return_image_query(df_top_k_images, query_image=None, url=None, front_end=False):
+def return_image_query(df_top_k_images, query_image=None, url=None, front_end=False, cropping=True):
     """
     query on an image per user input and return similar products
 
@@ -74,7 +74,11 @@ def return_image_query(df_top_k_images, query_image=None, url=None, front_end=Fa
     columns=st.columns(2, gap='small')
 
     new_height=360
-    query_width, query_height = Image.open(query_image).size
+    if cropping==False:
+        query_width, query_height = Image.open(query_image).size
+    else:
+        query_width, query_height = query_image.size
+
     new_query_width=query_width*(new_height/query_height)
 
 
