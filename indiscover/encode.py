@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import pickle as pk
-from tensorflow.keras.applications import DenseNet121
+# from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+# from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
 def build_encoder(latent_dimension):
     encoder=Sequential()
@@ -58,13 +58,15 @@ def encode_chunks_save_pickle(encoder, chunk_num):
 
     pass
 
-def d2v(df_proc,save_model=False):
-    tagged_data=[TaggedDocument(words=text, tags=[i]) for i, text in enumerate(df_proc["text_tokens"])]
-    d2v=Doc2Vec(vector_size=30, epochs=80, min_count=2)
-    d2v.build_vocab(tagged_data)
-    d2v.train(tagged_data, total_examples=d2v.corpus_count, epochs=80)
+#for topic modeling
 
-    if save_model:
-        d2v.save("models/d2v.model")
+# def d2v(df_proc,save_model=False):
+#     tagged_data=[TaggedDocument(words=text, tags=[i]) for i, text in enumerate(df_proc["text_tokens"])]
+#     d2v=Doc2Vec(vector_size=30, epochs=80, min_count=2)
+#     d2v.build_vocab(tagged_data)
+#     d2v.train(tagged_data, total_examples=d2v.corpus_count, epochs=80)
 
-    return d2v
+#     if save_model:
+#         d2v.save("models/d2v.model")
+
+#     return d2v
