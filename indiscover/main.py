@@ -22,9 +22,6 @@ df_full=load_full_df()
 df_proc=preprocessor(df_products)
 
 
-#prepare user dataframe for front end
-df_interface=df_full.merge(df_products.drop("num", axis=1), how='left',on='product_page')
-
 
 def image_workflow(topk, image=None, url=None, encode_all_image=False, load_tf_model=False, return_images=True):
     if load_tf_model==True:
@@ -68,9 +65,10 @@ def return_image_query(df_top_k_images, query_image=None, url=None, front_end=Fa
     """
     product_list=[]
 
-    columns=st.columns(2, gap='small')
+
 
     new_height=360
+
     if cropping==False:
         query_width, query_height = Image.open(query_image).size
     else:
@@ -92,7 +90,6 @@ def return_image_query(df_top_k_images, query_image=None, url=None, front_end=Fa
 
 
                 ax1_url=df_full["product_image_url"].loc[i]
-
                 ax2_url=url
 
                 ax1.imshow(Image.open(requests.get(ax1_url, stream=True).raw))
@@ -109,11 +106,19 @@ def return_image_query(df_top_k_images, query_image=None, url=None, front_end=Fa
                 width, height = img_df.size
                 new_width=width*(new_height/height)
                 img_df=img_df.resize((int(new_width),int(new_height)))
-                columns[0].image(img_df)
 
+                with st.expander('', expanded=True):
 
+                    df_item=df_full[df_full.num==i]
+                    url =df_item['product_page'].reset_index(drop=True).loc[0]
+                    txt=f"{df_item['product_name'].reset_index(drop=True).loc[0]} by {df_item['designer_name'].reset_index(drop=True).loc[0]}"
+                    page=df_item['product_page'].reset_index(drop=True).loc[0]
+                    link=f"   [{txt}]({page})"
+                    columns=st.columns(2, gap='small')
+                    columns[0].image(img_df)
+                    columns[1].image(query_image, width=int(new_query_width))
 
-                columns[1].image(query_image, width=int(new_query_width))
+                    st.markdown(link, unsafe_allow_html=True)
 
 
 
